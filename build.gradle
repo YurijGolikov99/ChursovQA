@@ -1,0 +1,50 @@
+plugins {
+    id 'java'
+    id 'io.qameta.allure' version '2.11.2'
+}
+
+group = 'yurecgolikov'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Подключаем BOM и не прописываем версии дальше
+    testImplementation platform('org.junit:junit-bom:5.10.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params'
+    // Тестовый движок
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+
+    testImplementation 'org.assertj:assertj-core:3.23.1'
+
+    // Подключение Allure для JUnit 5
+    testImplementation 'io.qameta.allure:allure-junit5:2.24.0'
+}
+
+allure {
+    version = '2.24.0' // Версия Allure
+    autoconfigure = true
+    aspectjweaver = true
+    useJUnit5 {
+        version = '2.24.0'
+    }
+}
+
+test {
+    useJUnitPlatform {
+        // Явно включаем параллельный запуск:
+        systemProperty 'junit.jupiter.execution.parallel.enabled', 'true'
+        // Устанавливаем режим для методов и классов
+        systemProperty 'junit.jupiter.execution.parallel.mode.default', 'concurrent'
+        systemProperty 'junit.jupiter.execution.parallel.mode.classes.default', 'concurrent'
+        // Задаём стратегию 'fixed' и необходимый параметр fixed.parallelism:
+        systemProperty 'junit.jupiter.execution.parallel.strategy', 'fixed'
+        systemProperty 'junit.jupiter.execution.parallel.config.fixed.parallelism', '4'
+
+        systemProperty 'allure.results.directory', 'build/allure-results'
+    }
+}
